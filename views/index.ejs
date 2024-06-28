@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vonage Video Bot Scheduler</title>
+    <!-- Adding Bootstrap CSS CDN -->
+    <link
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+
+    <style>
+      html,
+      body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+      }
+
+      .streams {
+        gap: 10px;
+      }
+
+      .stream {
+        min-width: calc(50% - 5px);
+        height: 300px;
+        border: 1px solid #ccc;
+      }
+    </style>
+  </head>
+
+  <body class="container mt-4">
+    <div
+      id="stream-container"
+      class="streams d-flex flex-row"
+    >
+      <!-- Placeholder divs for the streams. You can replace these with actual stream containers or add more as needed. -->
+    </div>
+
+    <script src="https://static.opentok.com/v2/js/opentok.min.js"></script>
+    <script>
+      const apikey = "<%= apiKey %>";
+      const sessionId = "<%= sessionId %>";
+      const token = "<%= token %>";
+      const publisher = OT.initPublisher("stream-container", {
+        insertMode: "append",
+        width: "100%",
+        height: "100%",
+      });
+      const session = OT.initSession(apikey, sessionId);
+      session.connect(token, (error) => {
+        if (error) {
+          console.error("Error connecting: ", error);
+        } else {
+          session.publish(publisher, (error) => {
+            if (error) {
+              console.error("Error publishing: ", error);
+            }
+          });
+        }
+      });
+      // Handle the streamCreated event
+      session.on("streamCreated", function (event) {
+        subscriber = session.subscribe(event.stream, "containerId", {
+          insertMode: "append",
+          width: "100%",
+          height: "100%",
+        });
+      });
+    </script>
+  </body>
+</html>
